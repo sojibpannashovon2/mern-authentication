@@ -1,6 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signin = () => {
+  const [user, setUser] = useState([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = () => {
+    axios.get(`http://localhost:3001/register`).then((res) => {
+      console.log(res.data);
+    });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    axios
+      .post(`http://localhost:3001/register`, { email, userName, password })
+      .then(() => {
+        alert("Registration successfull");
+        setEmail();
+        setUserName();
+        setPassword();
+        fetchUser();
+        navigate(`/login`);
+      });
+  };
+
   return (
     <div className="bg-gray-100 flex items-center justify-center h-screen py-10">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
@@ -25,7 +56,7 @@ const Signin = () => {
         <p className="text-gray-600 text-center mb-6">
           Enter your details to register.
         </p>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="fullName"
@@ -38,7 +69,9 @@ const Signin = () => {
               id="fullName"
               className="form-input w-full px-4 py-2 border rounded-lg text-gray-700 focus:ring-blue-500"
               required
-              placeholder="James Brown"
+              placeholder="userName"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
           </div>
           <div className="mb-4">
@@ -53,7 +86,9 @@ const Signin = () => {
               id="email"
               className="form-input w-full px-4 py-2 border rounded-lg text-gray-700 focus:ring-blue-500"
               required
-              placeholder="hello@alignui.com"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-6">
@@ -69,6 +104,8 @@ const Signin = () => {
               className="form-input w-full px-4 py-2 border rounded-lg text-gray-700 focus:ring-blue-500"
               required
               placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <p className="text-gray-600 text-xs mt-1">
               Must contain 1 uppercase letter, 1 number, min. 8 characters.
