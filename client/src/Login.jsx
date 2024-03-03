@@ -1,7 +1,44 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [user, setUser] = useState([]);
+
+  const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = () => {
+    axios.get(`http://localhost:3001/register`).then((res) => {
+      console.log(res.data);
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const response = await axios.post(`http://localhost:3001/login`, {
+      userName,
+      password,
+    });
+    const token = response.data.token;
+    try {
+      alert("Login successfull");
+
+      setUserName();
+      setPassword();
+      fetchUser();
+
+      navigate(`/`);
+      window.location.reload();
+      localStorage.setItem("token", token);
+    } catch (error) {
+      console.log("Login Error found");
+    }
+  };
   return (
     <div>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -13,21 +50,28 @@ const Login = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            action="#"
+            method="POST"
+          >
             <div>
               <label
-                htmlFor="email"
+                htmlFor="userName"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Email address
+                userName
               </label>
               <div className="mt-2">
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
+                  id="text"
+                  name="text"
+                  type="text"
                   autoComplete="email"
                   required
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
@@ -57,6 +101,8 @@ const Login = () => {
                   type="password"
                   autoComplete="current-password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
@@ -74,12 +120,12 @@ const Login = () => {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Are you new to the website
-            <a
-              href="#"
+            <Link
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+              to={`/signup`}
             >
-              <Link to={`/signup`}>Register Now</Link>
-            </a>
+              Register Now
+            </Link>
           </p>
         </div>
       </div>
